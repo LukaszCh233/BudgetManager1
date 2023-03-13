@@ -2,10 +2,17 @@
 
 
 
+import java.io.*;
+import java.time.LocalDate;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class BudgetFunction {
+    LocalDate lastWriteDate = LocalDate.now().withDayOfMonth(1);
+    LocalDate currentDate = LocalDate.now();
+    String fileName = lastWriteDate.getMonth().toString() + "_" + lastWriteDate.getYear() + ".txt";
+
+
     ProfExpenList profExpenList = new ProfExpenList();
     // BudgetFunction is class where the functions for the Budget Manager project are performed.
 
@@ -13,6 +20,9 @@ public class BudgetFunction {
     public void addProfit() {
         Scanner scanner = new Scanner(System.in);
         String backMenu;
+        if (profExpenList == null) {
+            profExpenList = new ProfExpenList();
+        }
 
         do {
             System.out.println("PODAJ NAZWE I KWOTE PRZYCHODU: ");
@@ -37,6 +47,7 @@ public class BudgetFunction {
     public void addExpenses() {
         Scanner scanner = new Scanner(System.in);
         String backMenu;
+
 
         do {
             System.out.println("PODAJ NAZWE I KWOTE WYDATKU: ");
@@ -115,5 +126,64 @@ public class BudgetFunction {
                 }
             }
         } while (!backMenu.equalsIgnoreCase("nie"));
+    }
+    public void fileWriter() {
+
+
+        try {
+            FileWriter fileWriter = new FileWriter(fileName);
+            for (ProfExpens pe : profExpenList.list) {
+                fileWriter.write(pe.getName() + "," + pe.getAmount() + "," + pe.getType() + "\n");
+            }
+            fileWriter.close();
+            System.out.println("Lista zapisana do pliku.");
+        } catch (
+                FileNotFoundException e) {
+            System.out.println("Nie znaleziono pliku.");
+            e.printStackTrace();
+        } catch (
+                IOException e) {
+            System.out.println("Błąd podczas zapisu do pliku.");
+            e.printStackTrace();
+        }
+    }
+    public void loadFile() {
+
+        try {
+            FileReader reader = new FileReader(fileName);
+            Scanner scanner = new Scanner(reader);
+            while (scanner.hasNextLine()) {
+                String[] line = scanner.nextLine().split(",");
+                if (line.length == 3) {
+                    ProfitExpensType type = ProfitExpensType.valueOf(line[2]);
+                    String name = line[0];
+                    double amount = Double.parseDouble(line[1]);
+                    profExpenList.list.add(new ProfExpens(name, amount, type));
+                }
+            }
+            scanner.close();
+            reader.close();
+            System.out.println("Lista wczytana z pliku.");
+        } catch (IOException e) {
+            System.out.println("Błąd podczas odczytu z pliku.");
+            e.printStackTrace();
+        }
+    }
+    public void checkMonth() {
+
+        if (!lastWriteDate.equals(currentDate)) {
+
+            try {
+                File file = new File(fileName);
+                if (file.createNewFile()) {
+                    System.out.println("Utworzono plik " + fileName);
+                } else {
+                    System.out.println("Plik " + fileName + " już istnieje.");
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

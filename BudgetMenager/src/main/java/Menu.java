@@ -1,16 +1,13 @@
-
-
 import java.util.Scanner;
 
 public class Menu {
     BudgetFunction budgetFunction = new BudgetFunction();
-    FileCreator fileCreator = new FileCreator();
+
     public  void useMenu() {
         Scanner scanner = new Scanner(System.in);
         String choice;
-
-
-
+        budgetFunction.checkMonth();
+        budgetFunction.loadFile();
 
         do {
             System.out.println("WYBIERZ CO CHCESZ ZROBIC:");
@@ -28,7 +25,7 @@ public class Menu {
                     break;
                 case "3":
                     budgetFunction.ProfExpenView();
-                    fileCreator.nextMonth();
+                    budgetFunction.fileWriter();
 
                     break;
                 case "0":
